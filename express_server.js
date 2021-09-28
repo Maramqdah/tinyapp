@@ -6,6 +6,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 var path = require('path');
 const { get } = require("express/lib/response");
+const req = require("express/lib/request");
+const res = require("express/lib/response");
 app.set("view engine", "ejs");
 app.set('views', path.join(__dirname, 'views'));
 
@@ -63,4 +65,11 @@ app.get("/u/:shortURL", (req, res) => {
   const longUrl=urlDatabase[shortURL];
   res.redirect(longUrl);
 
+});
+app.post("/urls/:shortURL/delete",(req,res)=>{
+  console.log("Deleting");
+  console.log(req.params.shortURL);
+  delete urlDatabase[req.params.shortURL];
+  console.log(urlDatabase);
+ res.redirect("/urls");
 });

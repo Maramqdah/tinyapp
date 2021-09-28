@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 var path = require('path');
+const { get } = require("express/lib/response");
 app.set("view engine", "ejs");
 app.set('views', path.join(__dirname, 'views'));
 
@@ -43,12 +44,23 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+ // console.log(req.body);  // Log the POST request body to the console
+ // res.send("Ok");        // Respond with 'Ok' (we will replace this)
+ const shortUrl=generateRandomString();
+ const longUrl=req.body['longURL'];
+ urlDatabase[shortUrl]=longUrl;
+
+ res.redirect("/urls");
 })
 function generateRandomString() {
   const randomShortUrl= (Math.random() + 1).toString(36).substring(6);
-
   return randomShortUrl;
-
 }
+app.get("/u/:shortURL", (req, res) => {
+  // const longURL = ...
+  console.log(req.params);
+  const shortURL=req.params.shortURL;
+  const longUrl=urlDatabase[shortURL];
+  res.redirect(longUrl);
+
+});

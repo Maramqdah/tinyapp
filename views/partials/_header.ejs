@@ -13,8 +13,8 @@
       </div>
     </div>
 
-    <% if(user){ %>
-      <h4>Loged in <%= user.email %></h4>
+    <% if(username){ %>
+      <h4>Loged in <%= username.email %></h4>
       <form class="form-inline" method="POST"  action="/logout" class="form-inline">
         <button class="btn  my-2 my-sm-0" type="submit"  value="logout" > Logout</button>
     <% } else{ %>  

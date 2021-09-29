@@ -38,6 +38,35 @@ function generateRandomString() {
   const randomShortUrl= (Math.random() + 1).toString(36).substring(6);
   return randomShortUrl;
 };
+const findUserByEmail = function (email, users) {
+  for (let userId in users) {
+    
+    const user = users[userId];
+    console.log(user);
+    console.log(email);
+    console.log(user.email === email);
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return null;
+  
+};
+const authenticateUser = function (email, password, users) {
+  // retrieve the user from the db
+  const userFound = findUserByEmail(email, users);
+
+  // compare the passwords
+  // password match => log in
+  // password dont' match => error message
+  if (userFound && userFound.password === password) {
+    return userFound;
+  }
+
+  return false;
+};
+
+
 
 
 app.get("/", (req, res) => {
@@ -55,12 +84,12 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, username: users[req.cookies["username"]] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { username: users[req.cookies["username"]] };
   res.render("urls_new",templateVars);
 });
 
@@ -68,7 +97,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
    const userID=req.cookies.userid;
    //console.log(userID);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user :users[userID]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username :users[userID]};
   res.render("urls_show", templateVars);
  // console.log("email:",users[userID] );
 });
@@ -131,15 +160,29 @@ app.post("/logout",(req,res)=> {
  });
 
  app.post("/register",(req,res)=>{
+const email=req.body.email;
+const password=req.body.password;
+console.log(email,password);
+
+if(!email || !password){
+  return res.status(400).send("add email or password");
+  //res.send("add email or password");
+}
+  else if(findUserByEmail(email,users)){
+   return res.status(400).send("email already exist")
+   
+  }
+
  const userId = generateRandomString();
- //console.log(userId)
+
  users[userId] = {
   id: userId,
   email: req.body.email,
   password: req.body.password,
 };
 res.cookie('userid', userId);
-//console.log(users);
+
+console.log("line177");
 res.redirect("/urls");
 
  });

@@ -65,8 +65,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
+
+   const userID=req.cookies.userid;
+   //console.log(userID);
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user :users[userID]};
   res.render("urls_show", templateVars);
+ // console.log("email:",users[userID] );
 });
 
 app.post("/urls", (req, res) => {
@@ -105,7 +109,7 @@ res.redirect("/urls");
 });
 
 app.post("/login",(req,res)=> {
- console.log(req.body);
+ //console.log(req.body);
  res.cookie("username",req.body.username);
  res.redirect("/urls");
 

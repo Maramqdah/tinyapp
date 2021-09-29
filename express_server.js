@@ -137,6 +137,12 @@ urlDatabase[shortURL]=longURL;
 res.redirect("/urls");
 });
 
+app.get("/login",(req,res) =>{
+const templateVars = { urls: urlDatabase, username: users[req.cookies["username"]] };
+res.render("urls_login",templateVars);
+
+});
+
 app.post("/login",(req,res)=> {
  //console.log(req.body);
  res.cookie("username",req.body.username);
@@ -170,19 +176,14 @@ if(!email || !password){
 }
   else if(findUserByEmail(email,users)){
    return res.status(400).send("email already exist")
-   
   }
-
  const userId = generateRandomString();
-
  users[userId] = {
   id: userId,
   email: req.body.email,
   password: req.body.password,
 };
 res.cookie('userid', userId);
-
-console.log("line177");
 res.redirect("/urls");
 
  });

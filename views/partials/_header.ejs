@@ -12,7 +12,7 @@
     </div>
     <% if(username) { %>
       <div class="navbar-nav" display="inline-block">
-        <span style="margin-right:10px">Logged in as: <%=username%></span>
+        <span style="margin-right:10px">Logged in as: <%=username["email"]%></span>
         <form method="POST" action="/logout">
         <button type="submit" value="submit" class="btn btn-outline-dark">Logout</button>
       </form>

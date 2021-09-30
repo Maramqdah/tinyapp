@@ -82,12 +82,12 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: users[req.cookies["username"]] };
+  const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: users[req.cookies["username"]] };
+  const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("urls_new",templateVars);
 });
 
@@ -137,7 +137,7 @@ res.redirect("/urls");
 
 app.get("/login",(req,res) =>{
 
-const templateVars = { urls: urlDatabase, username: users[req.cookies["username"]] };
+const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
 res.render("urls_login",templateVars);
 });
 
@@ -145,19 +145,21 @@ app.post("/login",(req,res)=> {
 
 const email= req.body.email;
 const password= req.body.password;
-res.cookie("use_id",req.body.userid);
 if(!findUserByEmail(email,users)){
   return res.status(403).send("email cannot be found");
 }else if(!authenticateUser(email,password,users)){
   return res.status(403).send("incorrect password")
 }
-
+const userFound = findUserByEmail(email, users);
+console.log("userFound", userFound);
+console.log("userid",req.body)
+res.cookie("user_id",userFound.id);// settting cookies with user_id
 res.redirect("/urls");
 });
 
 app.post("/logout",(req,res)=> {
   //console.log(req.body);
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
  
  });
@@ -165,7 +167,7 @@ app.post("/logout",(req,res)=> {
 
  app.get("/register",(req,res)=> {
 
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { username: req.cookies["user_id"] };
   res.render("register",templateVars);
 
  });
@@ -187,7 +189,7 @@ if(!email || !password){
   email: req.body.email,
   password: req.body.password,
 };
-res.cookie('userid', userId);
+res.cookie('user_id', userId);
 res.redirect("/urls");
 
  });

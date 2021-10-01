@@ -56,22 +56,6 @@ function generateRandomString() {
   return randomShortUrl;
 };
 
-// const findUserByEmail = function (email, users) {
-//   for (let userId in users) {
-//     const user = users[userId];
-//     //console.log(user);
-//     // console.log(email);
-//     //console.log(user.email === email);
-//     if (user.email === email) {
-//       return user;
-//     }
-//   }
-//   return null;
-//};
-
-//(bcrypt.compareSync(password, userDB[email].password))
-//if(userFound && (bcrypt.compareSync(password, userFound.password)
-
 const authenticateUser = function (email, password, users) {
   // retrieve the user from the db
   const userFound = findUserByEmail(email, users);
@@ -121,7 +105,7 @@ app.post("/urls", (req, res) => {
 })
 
 app.get("/urls", (req, res) => {
-  const user_id = req.session;
+  const user_id = req.session.user_id;
   //console.log(user_id);
 
   if (!user_id) {
@@ -129,7 +113,7 @@ app.get("/urls", (req, res) => {
   }
   const urls = urlsForUser(user_id);
 
-  const templateVars = { urls: urls, username: users[req.session,user_id] };
+  const templateVars = { urls: urls, user: users[req.session,user_id] };
   res.render("urls_index", templateVars);
 });
 //------------------------------------------------------------------------------------------------------
@@ -139,17 +123,17 @@ app.get("/urls/new", (req, res) => {
   if (!user_id) {
     return res.redirect("/login");
   }
-  const templateVars = { username: users[req.session.user_id] };
+  const templateVars = { user: users[req.session.user_id] };
   res.render("urls_new", templateVars);
 
 });
 
-app.post("/urls/new", (req, res) => {
-  const user_id = req.session.user_id;
-  if (!user_id) {
-    return res.redirect("/login");
-  }
-});
+// app.post("/urls/new", (req, res) => {
+//   const user_id = req.session.user_id;
+//   if (!user_id) {
+//     return res.redirect("/login");
+//   }
+// });
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -170,7 +154,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 
   //console.log(req.params.shortURL);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, username: users[userID] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[userID] };
   res.render("urls_show", templateVars);
   // console.log("email:",users[userID] );
 });
@@ -206,7 +190,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //-------------------------------------------------------------------------------------------------------
 
 app.get("/login", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: users[req.session.user_id] };
+  const templateVars = { urls: urlDatabase, user: users[req.session.user_id] };
   res.render("urls_login", templateVars);
 });
 
@@ -241,7 +225,7 @@ app.post("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
 
-  const templateVars = { username: req.session.user_id};
+  const templateVars = { user: req.session.user_id};
   res.render("register", templateVars);
 
 });
@@ -254,7 +238,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("add email or password");
     //res.send("add email or password");
   }
-  else if (helpers.findUserByEmail(email, users)) {
+  else if (findUserByEmail(email, users)) {
     return res.status(400).send("email already exist")
   }
   const userId = generateRandomString();
@@ -262,7 +246,7 @@ app.post("/register", (req, res) => {
   users[userId] = {
     id: userId,
     email: email,
-    password: bcrypt.hashSync(req.body.password),
+    password: bcrypt.hashSync(password,10),
   };
   req.session.user_id = userId;
 

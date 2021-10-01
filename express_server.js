@@ -6,8 +6,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var cookieParser = require('cookie-parser');
 //app.use(cookieParser());
 var cookieSession = require('cookie-session');
+const {findUserByEmail } = require("./helpers.js");
 
-app.use(
+ app.use(
 	cookieSession({
 		name: "session",
 		keys: ["Some way to encrypt the values", "$!~`yEs123bla!!%"],
@@ -55,18 +56,18 @@ function generateRandomString() {
   return randomShortUrl;
 };
 
-const findUserByEmail = function (email, users) {
-  for (let userId in users) {
-    const user = users[userId];
-    //console.log(user);
-    // console.log(email);
-    //console.log(user.email === email);
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
-};
+// const findUserByEmail = function (email, users) {
+//   for (let userId in users) {
+//     const user = users[userId];
+//     //console.log(user);
+//     // console.log(email);
+//     //console.log(user.email === email);
+//     if (user.email === email) {
+//       return user;
+//     }
+//   }
+//   return null;
+//};
 
 //(bcrypt.compareSync(password, userDB[email].password))
 //if(userFound && (bcrypt.compareSync(password, userFound.password)
@@ -121,7 +122,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const user_id = req.session;
-  console.log(user_id);
+  //console.log(user_id);
 
   if (!user_id) {
     return res.status(403).send("Not logged in");
@@ -253,7 +254,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("add email or password");
     //res.send("add email or password");
   }
-  else if (findUserByEmail(email, users)) {
+  else if (helpers.findUserByEmail(email, users)) {
     return res.status(400).send("email already exist")
   }
   const userId = generateRandomString();

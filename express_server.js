@@ -80,14 +80,7 @@ const urlsForUser = function (id) {
 
 }
 
-//==============================================================================================
 
-app.listen(PORT, () => {
-  // console.log(`Example app listening on port ${PORT}!`);
-});
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 //================================================================================================
 
 app.post("/urls", (req, res) => {
@@ -172,9 +165,20 @@ app.get("/u/:shortURL", (req, res) => {
 //-------------------------------------------------------------------------------------------------------
 app.post("/urls/:shortURL/delete", (req, res) => {
   
-  const user_id = res.body.session;
+  const user_id = req.body.session;
+  const user = users[user_id];
+  if(!user){
+    
+    return res.status(403).send("Not loged In");
+  }
+  const url=urlDatabase[req.params.shortURL];
+  if(!url || user.id !== url.userID){
+    return res.status(403).send("URL not exist");
+
+  }
+
   delete urlDatabase[req.params.shortURL];
- 
+
   res.redirect("/urls");
 });
 
@@ -240,5 +244,14 @@ app.post("/register", (req, res) => {
 
   res.redirect("/urls");
 
+});
+
+//==============================================================================================
+
+app.listen(PORT, () => {
+  // console.log(`Example app listening on port ${PORT}!`);
+});
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
